@@ -1,0 +1,666 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: var(--color-text-primary);
+    --muted: var(--color-text-secondary);
+    --surface: var(--color-background-primary);
+    --raised: var(--color-background-secondary);
+    --border: var(--color-border-tertiary);
+    --accent: #1D9E75;
+    --accent-light: #E1F5EE;
+    --accent-mid: #5DCAA5;
+    --warm: #F0997B;
+    --warm-light: #FAECE7;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+  }
+
+  body { font-family: 'Syne', sans-serif; background: transparent; overflow-x: hidden; }
+
+  .app { display: flex; flex-direction: column; }
+
+  /* NAV */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2rem; border-bottom: 0.5px solid var(--border);
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.5px;
+    color: var(--ink);
+  }
+  .nav-logo span { color: var(--accent); font-style: italic; }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+  .nav-links a {
+    font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.02em;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .btn-nav {
+    background: var(--ink); color: var(--surface); border: none;
+    padding: 6px 16px; border-radius: 100px; font-size: 13px;
+    font-family: 'Syne', sans-serif; cursor: pointer; letter-spacing: 0.02em;
+    transition: opacity 0.2s;
+  }
+  .btn-nav:hover { opacity: 0.75; }
+
+  /* HERO */
+  .hero {
+    padding: 5rem 2rem 3rem;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent-light); color: #0F6E56;
+    font-size: 11px; letter-spacing: 0.08em; padding: 4px 12px;
+    border-radius: 100px; margin-bottom: 1.5rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .hero-tag::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+
+  .hero h1 {
+    font-family: 'Instrument Serif', serif; font-size: 52px; line-height: 1.05;
+    letter-spacing: -1.5px; color: var(--ink); max-width: 640px; margin-bottom: 1.25rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero p {
+    font-size: 16px; color: var(--muted); max-width: 440px; line-height: 1.65;
+    margin-bottom: 2.5rem; font-family: 'Syne', sans-serif; font-weight: 400;
+  }
+
+  /* QUICK DUMP */
+  .quick-dump {
+    width: 100%; max-width: 600px;
+    display: flex; flex-direction: column; align-items: stretch; gap: 0;
+    border: 1.5px solid var(--border); border-radius: 16px;
+    background: var(--surface); overflow: hidden;
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 8%, transparent);
+    transition: box-shadow 0.3s;
+  }
+  .quick-dump:focus-within {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 18%, transparent);
+    border-color: var(--accent-mid);
+  }
+  .dump-header {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--raised);
+  }
+  .dump-header span {
+    font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+  .dump-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .dump-textarea {
+    border: none; outline: none; padding: 1rem 1.25rem;
+    font-size: 15px; font-family: 'Syne', sans-serif; color: var(--ink);
+    background: var(--surface); resize: none; width: 100%; height: 80px;
+    line-height: 1.6;
+  }
+  .dump-textarea::placeholder { color: var(--muted); opacity: 0.6; }
+  .dump-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; border-top: 0.5px solid var(--border);
+    background: var(--raised);
+  }
+  .dump-meta {
+    font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace;
+    display: flex; gap: 12px;
+  }
+  .btn-dump {
+    background: var(--accent); color: white; border: none;
+    padding: 7px 20px; border-radius: 100px; font-size: 13px;
+    font-family: 'Syne', sans-serif; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-dump:hover { background: #0F6E56; }
+  .btn-dump:active { transform: scale(0.97); }
+  .btn-dump .kbd { font-size: 10px; opacity: 0.7; font-family: 'DM Mono',monospace; }
+
+  /* SECTIONS PREVIEW */
+  .sections-strip {
+    display: flex; gap: 0; padding: 0 0 0 2rem;
+    border-top: 0.5px solid var(--border);
+    border-bottom: 0.5px solid var(--border);
+    overflow-x: auto; scrollbar-width: none;
+    margin-top: 0;
+  }
+  .sections-strip::-webkit-scrollbar { display: none; }
+  .section-tab {
+    display: flex; align-items: center; gap: 8px; padding: 0.85rem 1.5rem;
+    font-size: 12px; letter-spacing: 0.05em; color: var(--muted); cursor: pointer;
+    border-right: 0.5px solid var(--border); white-space: nowrap;
+    transition: all 0.2s; user-select: none;
+    border-bottom: 2px solid transparent;
+  }
+  .section-tab.active {
+    color: var(--ink); border-bottom: 2px solid var(--accent);
+    background: var(--raised);
+  }
+  .section-tab:hover:not(.active) { background: var(--raised); color: var(--ink); }
+  .tab-icon { font-size: 16px; }
+
+  /* MAIN PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* BRAINDUMP PANEL */
+  .braindump-panel { padding: 1.5rem 2rem; }
+  .bd-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .bd-title {
+    font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace;
+    letter-spacing: 0.08em;
+  }
+  .bd-actions { display: flex; gap: 8px; }
+  .btn-sm {
+    border: 0.5px solid var(--border); background: var(--surface);
+    color: var(--muted); padding: 4px 12px; border-radius: 100px;
+    font-size: 11px; cursor: pointer; font-family: 'Syne', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-sm:hover { color: var(--ink); border-color: var(--accent-mid); }
+
+  .mural {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    min-height: 280px;
+    padding: 1rem;
+    background: var(--raised);
+    border-radius: 12px;
+    border: 0.5px solid var(--border);
+    position: relative;
+  }
+  .mural-empty {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    color: var(--muted); font-size: 13px; pointer-events: none;
+  }
+  .mural-empty .empty-icon { font-size: 28px; opacity: 0.3; }
+
+  .postit {
+    border-radius: 2px; padding: 14px 14px 28px;
+    font-size: 13px; line-height: 1.55; color: #2C2C2A;
+    position: relative; cursor: pointer;
+    transform: rotate(var(--r, 0deg));
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 2px 3px 0 rgba(0,0,0,0.08);
+    animation: popin 0.3s cubic-bezier(0.175,0.885,0.32,1.275) both;
+    word-break: break-word;
+  }
+  @keyframes popin { from{transform:scale(0.7) rotate(var(--r,0deg));opacity:0} to{transform:scale(1) rotate(var(--r,0deg));opacity:1} }
+  .postit:hover {
+    transform: scale(1.04) rotate(0deg);
+    box-shadow: 4px 6px 0 rgba(0,0,0,0.13);
+    z-index: 10;
+  }
+  .postit-meta {
+    position: absolute; bottom: 8px; left: 14px; right: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .postit-time {
+    font-size: 10px; opacity: 0.5; font-family: 'DM Mono', monospace;
+  }
+  .postit-org {
+    font-size: 10px; background: rgba(0,0,0,0.08); padding: 2px 7px;
+    border-radius: 100px; opacity: 0.0; transition: opacity 0.2s;
+  }
+  .postit:hover .postit-org { opacity: 1; }
+
+  .postit-colors {
+    '--y': '#FAEEDA', '--g': '#EAF3DE', '--b': '#E6F1FB',
+    '--p': '#EEEDFE', '--c': '#E1F5EE', '--k': '#FAECE7'
+  }
+
+  /* TASKS PANEL */
+  .tasks-panel { padding: 1.5rem 2rem; }
+  .tasks-filters {
+    display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap;
+  }
+  .filter-btn {
+    border: 0.5px solid var(--border); background: var(--surface);
+    color: var(--muted); padding: 5px 14px; border-radius: 100px;
+    font-size: 12px; cursor: pointer; font-family: 'Syne',sans-serif;
+    transition: all 0.15s;
+  }
+  .filter-btn.active {
+    background: var(--ink); color: var(--surface); border-color: var(--ink);
+  }
+  .filter-btn:hover:not(.active) { border-color: var(--muted); color: var(--ink); }
+
+  .tasks-list { display: flex; flex-direction: column; gap: 8px; }
+  .task-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-radius: 10px;
+    border: 0.5px solid var(--border); background: var(--surface);
+    transition: border-color 0.15s; cursor: pointer;
+  }
+  .task-card:hover { border-color: var(--accent-mid); }
+  .task-check {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.5px solid var(--border); flex-shrink: 0;
+    transition: all 0.2s; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .task-check.done { background: var(--accent); border-color: var(--accent); }
+  .task-check.done::after { content: '✓'; color: white; font-size: 10px; }
+  .task-info { flex: 1; }
+  .task-name { font-size: 14px; color: var(--ink); font-weight: 400; }
+  .task-name.done { text-decoration: line-through; color: var(--muted); }
+  .task-sub { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; gap: 10px; }
+  .task-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 100px;
+    font-family: 'DM Mono', monospace; letter-spacing: 0.04em;
+  }
+  .tag-escuela { background: var(--purple-light); color: #3C3489; }
+  .tag-trabajo { background: var(--amber-light); color: #633806; }
+  .tag-personal { background: var(--accent-light); color: #085041; }
+
+  /* PROGRESS PANEL */
+  .progress-panel { padding: 1.5rem 2rem; }
+  .habits-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;
+  }
+  .habit-card {
+    border: 0.5px solid var(--border); border-radius: 12px;
+    background: var(--surface); padding: 1rem;
+  }
+  .habit-name { font-size: 13px; color: var(--ink); margin-bottom: 8px; font-weight: 600; }
+  .habit-streak {
+    font-family: 'Instrument Serif', serif; font-size: 28px; color: var(--accent);
+    line-height: 1; margin-bottom: 4px;
+  }
+  .habit-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .habit-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+  .h-dot {
+    width: 14px; height: 14px; border-radius: 3px;
+    background: var(--raised); border: 0.5px solid var(--border);
+  }
+  .h-dot.filled { background: var(--accent); border-color: var(--accent); }
+  .h-dot.partial { background: var(--accent-mid); border-color: var(--accent-mid); opacity: 0.5; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.45);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 16px;
+    border: 0.5px solid var(--border);
+    padding: 1.5rem; width: 340px; max-width: 90vw;
+  }
+  .modal h3 {
+    font-family: 'Instrument Serif', serif; font-size: 20px; margin-bottom: 1rem;
+    color: var(--ink);
+  }
+  .modal-field { margin-bottom: 0.75rem; }
+  .modal-field label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 4px; letter-spacing: 0.05em; }
+  .modal-field input, .modal-field select, .modal-field textarea {
+    width: 100%; border: 0.5px solid var(--border); border-radius: 8px;
+    padding: 7px 10px; font-size: 13px; background: var(--surface); color: var(--ink);
+    font-family: 'Syne', sans-serif; outline: none;
+    transition: border-color 0.2s;
+  }
+  .modal-field input:focus, .modal-field select:focus { border-color: var(--accent-mid); }
+  .modal-actions { display: flex; gap: 8px; margin-top: 1rem; justify-content: flex-end; }
+  .btn-cancel {
+    border: 0.5px solid var(--border); background: transparent; color: var(--muted);
+    padding: 7px 16px; border-radius: 100px; font-size: 12px; cursor: pointer;
+    font-family: 'Syne', sans-serif;
+  }
+  .btn-confirm {
+    background: var(--accent); color: white; border: none;
+    padding: 7px 16px; border-radius: 100px; font-size: 12px; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-weight: 600;
+  }
+  .btn-confirm:hover { background: #0F6E56; }
+
+  .fade-in { animation: fadeIn 0.25s ease both; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+</style>
+
+<h2 class="sr-only">Flowo — Aplicación de organización personal con braindump, tareas y progreso</h2>
+
+<div class="app">
+  <nav class="nav">
+    <div class="nav-logo">flow<span>o</span></div>
+    <div class="nav-links">
+      <a onclick="switchPanel('braindump')">Braindump</a>
+      <a onclick="switchPanel('tasks')">Tareas</a>
+      <a onclick="switchPanel('progress')">Progreso</a>
+      <button class="btn-nav">Entrar</button>
+    </div>
+  </nav>
+
+  <div class="hero" id="hero-section">
+    <div class="hero-tag">beta · versión 0.1</div>
+    <h1>Tu mente no es<br>un <em>archivo.</em></h1>
+    <p>Tira tus ideas sin orden, conviértelas en tareas cuando estés listo. Un solo lugar para todo lo que tu mente carga.</p>
+
+    <div class="quick-dump" id="quick-dump">
+      <div class="dump-header">
+        <div class="dump-dot"></div>
+        <span>braindump rápido</span>
+      </div>
+      <textarea
+        class="dump-textarea"
+        id="dump-input"
+        placeholder="¿Qué está dando vueltas en tu cabeza ahora mismo?"
+      ></textarea>
+      <div class="dump-actions">
+        <div class="dump-meta">
+          <span id="dump-time">ahora</span>
+          <span id="dump-count">0 ideas</span>
+        </div>
+        <button class="btn-dump" id="btn-send-dump">
+          Tirar idea <span class="kbd">↵</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sections-strip">
+    <div class="section-tab active" data-panel="braindump" onclick="switchPanel('braindump')">
+      <i class="ti ti-note tab-icon" aria-hidden="true"></i> Braindump
+    </div>
+    <div class="section-tab" data-panel="tasks" onclick="switchPanel('tasks')">
+      <i class="ti ti-checkbox tab-icon" aria-hidden="true"></i> Tareas
+    </div>
+    <div class="section-tab" data-panel="progress" onclick="switchPanel('progress')">
+      <i class="ti ti-chart-bar tab-icon" aria-hidden="true"></i> Progreso
+    </div>
+  </div>
+
+  <!-- BRAINDUMP PANEL -->
+  <div class="panel braindump-panel active" id="panel-braindump">
+    <div class="bd-toolbar">
+      <span class="bd-title">MURAL DE IDEAS</span>
+      <div class="bd-actions">
+        <button class="btn-sm">Filtrar</button>
+        <button class="btn-sm">Ordenar</button>
+      </div>
+    </div>
+    <div class="mural" id="mural">
+      <div class="mural-empty" id="mural-empty">
+        <div class="empty-icon"><i class="ti ti-bulb"></i></div>
+        <span>Escribe algo arriba para empezar</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASKS PANEL -->
+  <div class="panel tasks-panel" id="panel-tasks">
+    <div class="tasks-filters">
+      <button class="filter-btn active">Todos</button>
+      <button class="filter-btn">Diario</button>
+      <button class="filter-btn">Semanal</button>
+      <button class="filter-btn">Mensual</button>
+    </div>
+    <div class="tasks-list" id="tasks-list">
+      <div class="task-card">
+        <div class="task-check done"></div>
+        <div class="task-info">
+          <div class="task-name done">Revisar apuntes de cálculo</div>
+          <div class="task-sub">
+            <span>Hoy, 10:00am</span>
+            <span class="task-tag tag-escuela">escuela</span>
+          </div>
+        </div>
+      </div>
+      <div class="task-card">
+        <div class="task-check"></div>
+        <div class="task-info">
+          <div class="task-name">Enviar propuesta al cliente</div>
+          <div class="task-sub">
+            <span>Mañana, 3:00pm</span>
+            <span class="task-tag tag-trabajo">trabajo</span>
+          </div>
+        </div>
+      </div>
+      <div class="task-card">
+        <div class="task-check"></div>
+        <div class="task-info">
+          <div class="task-name">Llamar a mamá</div>
+          <div class="task-sub">
+            <span>Viernes</span>
+            <span class="task-tag tag-personal">personal</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS PANEL -->
+  <div class="panel progress-panel" id="panel-progress">
+    <div class="habits-grid">
+      <div class="habit-card">
+        <div class="habit-name">Leer</div>
+        <div class="habit-streak">12</div>
+        <div class="habit-label">días seguidos</div>
+        <div class="habit-dots" id="dots-read"></div>
+      </div>
+      <div class="habit-card">
+        <div class="habit-name">Braindump diario</div>
+        <div class="habit-streak">7</div>
+        <div class="habit-label">días seguidos</div>
+        <div class="habit-dots" id="dots-dump"></div>
+      </div>
+      <div class="habit-card">
+        <div class="habit-name">Tareas completadas</div>
+        <div class="habit-streak">84%</div>
+        <div class="habit-label">esta semana</div>
+        <div class="habit-dots" id="dots-tasks"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ORGANIZE MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal fade-in">
+    <h3>Convertir en tarea</h3>
+    <div class="modal-field">
+      <label>NOMBRE</label>
+      <input type="text" id="modal-name" />
+    </div>
+    <div class="modal-field">
+      <label>ETIQUETA</label>
+      <select id="modal-tag">
+        <option>personal</option>
+        <option>trabajo</option>
+        <option>escuela</option>
+        <option>familia</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>FECHA</label>
+      <input type="date" id="modal-date" />
+    </div>
+    <div class="modal-field">
+      <label>DESCRIPCIÓN (opcional)</label>
+      <textarea rows="2" id="modal-desc" style="resize:none"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-confirm" onclick="confirmOrganize()">Crear tarea</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS = ['#FAEEDA','#EAF3DE','#E6F1FB','#EEEDFE','#E1F5EE','#FAECE7'];
+const ROTATIONS = [-2,-1.2,0,1,2,1.5,-1.5,0.5,-0.5];
+let notes = [];
+let selectedNoteId = null;
+let noteCount = 0;
+
+const input = document.getElementById('dump-input');
+const mural = document.getElementById('mural');
+const muralEmpty = document.getElementById('mural-empty');
+const dumpCount = document.getElementById('dump-count');
+const dumpTime = document.getElementById('dump-time');
+const btnSend = document.getElementById('btn-send-dump');
+
+function getTime() {
+  const d = new Date();
+  return d.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+}
+
+function updateTime() {
+  dumpTime.textContent = getTime();
+}
+setInterval(updateTime, 30000);
+updateTime();
+
+function sendDump() {
+  const text = input.value.trim();
+  if (!text) return;
+  noteCount++;
+  const id = noteCount;
+  const color = COLORS[id % COLORS.length];
+  const rot = ROTATIONS[id % ROTATIONS.length];
+  const time = getTime();
+  notes.push({id, text, color, rot, time});
+  renderNote({id, text, color, rot, time});
+  input.value = '';
+  if (muralEmpty) muralEmpty.style.display = 'none';
+  dumpCount.textContent = `${notes.length} idea${notes.length > 1 ? 's' : ''}`;
+  switchPanel('braindump');
+}
+
+function renderNote({id, text, color, rot, time}) {
+  const el = document.createElement('div');
+  el.className = 'postit';
+  el.style.cssText = `background:${color};--r:${rot}deg;`;
+  el.dataset.id = id;
+  el.innerHTML = `
+    <span>${text}</span>
+    <div class="postit-meta">
+      <span class="postit-time">${time}</span>
+      <span class="postit-org" onclick="openModal(${id}, event)">organizar →</span>
+    </div>
+  `;
+  el.addEventListener('click', () => {
+    openModal(id, {stopPropagation: ()=>{}});
+  });
+  mural.appendChild(el);
+}
+
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendDump();
+  }
+});
+btnSend.addEventListener('click', sendDump);
+
+function switchPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.querySelector(`[data-panel="${name}"]`).classList.add('active');
+}
+
+function openModal(id, e) {
+  e.stopPropagation && e.stopPropagation();
+  selectedNoteId = id;
+  const note = notes.find(n => n.id == id);
+  if (note) {
+    document.getElementById('modal-name').value = note.text.slice(0, 40);
+    document.getElementById('modal-desc').value = '';
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('modal-date').value = today;
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  selectedNoteId = null;
+}
+
+function confirmOrganize() {
+  const name = document.getElementById('modal-name').value.trim() || 'Nueva tarea';
+  const tag = document.getElementById('modal-tag').value;
+  const date = document.getElementById('modal-date').value;
+  const tagMap = {personal:'tag-personal',trabajo:'tag-trabajo',escuela:'tag-escuela',familia:'tag-personal'};
+  const dateStr = date ? new Date(date).toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'}) : 'Sin fecha';
+  const list = document.getElementById('tasks-list');
+  const card = document.createElement('div');
+  card.className = 'task-card fade-in';
+  card.innerHTML = `
+    <div class="task-check" onclick="this.classList.toggle('done')"></div>
+    <div class="task-info">
+      <div class="task-name">${name}</div>
+      <div class="task-sub">
+        <span>${dateStr}</span>
+        <span class="task-tag ${tagMap[tag]||'tag-personal'}">${tag}</span>
+      </div>
+    </div>
+  `;
+  list.prepend(card);
+  if (selectedNoteId) {
+    const noteEl = mural.querySelector(`[data-id="${selectedNoteId}"]`);
+    if (noteEl) {
+      noteEl.style.opacity = '0.35';
+      noteEl.style.pointerEvents = 'none';
+    }
+    notes = notes.filter(n => n.id != selectedNoteId);
+  }
+  closeModal();
+  switchPanel('tasks');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.querySelectorAll('.task-check').forEach(check => {
+  check.addEventListener('click', function(e) {
+    e.stopPropagation();
+    this.classList.toggle('done');
+    const nameEl = this.parentElement.querySelector('.task-name');
+    if (nameEl) nameEl.classList.toggle('done', this.classList.contains('done'));
+  });
+});
+
+function buildDots(id, filled, partial, total) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'h-dot' + (i < filled ? ' filled' : i < filled + partial ? ' partial' : '');
+    el.appendChild(d);
+  }
+}
+buildDots('dots-read', 12, 0, 21);
+buildDots('dots-dump', 7, 2, 21);
+buildDots('dots-tasks', 14, 2, 21);
+</script>
