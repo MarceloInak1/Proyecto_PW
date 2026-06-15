@@ -1,1015 +1,180 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flujo — Captura todo. Pierde nada.</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            gold:    '#D4A017',
-            teal:    '#5BBFAD',
-            cyan:    '#1E9AB0',
-            blue:    '#2D4F8A',
-            navy:    '#1A2355',
-            deep:    '#0F1629',
-            surface: '#141B35',
-            card:    '#1C2748',
-            cardHov: '#222F56',
-          },
-          fontFamily: {
-            display: ['Sora', 'sans-serif'],
-            body:    ['Inter', 'sans-serif'],
-          },
-          animation: {
-            'float-slow':   'floatY 6s ease-in-out infinite',
-            'float-mid':    'floatY 5s ease-in-out infinite 1.2s',
-            'float-fast':   'floatY 4s ease-in-out infinite 0.6s',
-            'pulse-gold':   'pulseGold 3s ease-in-out infinite',
-            'slide-up':     'slideUp 0.6s ease-out forwards',
-            'fade-in':      'fadeIn 0.8s ease-out forwards',
-            'wave':         'wave 8s linear infinite',
-          },
-          keyframes: {
-            floatY: {
-              '0%,100%': { transform: 'translateY(0px) rotate(var(--r, -2deg))' },
-              '50%':     { transform: 'translateY(-10px) rotate(var(--r, -2deg))' },
-            },
-            pulseGold: {
-              '0%,100%': { boxShadow: '0 0 0 0 rgba(212,160,23,0.4)' },
-              '50%':     { boxShadow: '0 0 0 12px rgba(212,160,23,0)' },
-            },
-            slideUp: {
-              from: { opacity: '0', transform: 'translateY(30px)' },
-              to:   { opacity: '1', transform: 'translateY(0)' },
-            },
-            fadeIn: {
-              from: { opacity: '0' },
-              to:   { opacity: '1' },
-            },
-            wave: {
-              '0%':   { backgroundPosition: '0% 50%' },
-              '100%': { backgroundPosition: '200% 50%' },
-            },
-          },
-        },
-      },
-    }
-  </script>
-  <style>
-    /* ── base ── */
-    * { box-sizing: border-box; }
-    body {
-      background-color: #0F1629;
-      color: #e2e8f0;
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
-    }
+  <title>Flowo — un lugar para tu mente</title>
+  <meta name="description" content="Flowo: tira tus ideas, conviértelas en pendientes y mira tu progreso. Un solo lugar para todo lo que tu mente carga." />
 
-    /* ── scrollbar ── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0F1629; }
-    ::-webkit-scrollbar-thumb { background: #2D4F8A; border-radius: 3px; }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 
-    /* ── star canvas ── */
-    #stars {
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background:
-        radial-gradient(ellipse at 20% 30%, rgba(30,154,176,0.08) 0%, transparent 55%),
-        radial-gradient(ellipse at 80% 70%, rgba(45,79,138,0.12) 0%, transparent 55%),
-        #0F1629;
-    }
-
-    /* ── gradient text ── */
-    .text-gradient {
-      background: linear-gradient(135deg, #D4A017 0%, #5BBFAD 50%, #1E9AB0 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* ── glow border ── */
-    .glow-border {
-      border: 1px solid rgba(91,191,173,0.25);
-      box-shadow: 0 0 20px rgba(30,154,176,0.1), inset 0 1px 0 rgba(255,255,255,0.05);
-    }
-
-    /* ── post-it ── */
-    .postit {
-      background: linear-gradient(135deg, #1C2748 0%, #222F56 100%);
-      border: 1px solid rgba(91,191,173,0.2);
-      border-radius: 4px;
-      box-shadow:
-        0 4px 20px rgba(0,0,0,0.4),
-        0 0 0 1px rgba(30,154,176,0.08),
-        inset 0 1px 0 rgba(255,255,255,0.06);
-      position: absolute;
-    }
-    .postit::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      border-radius: 4px 4px 0 0;
-    }
-    .postit-gold::before  { background: #D4A017; }
-    .postit-teal::before  { background: #5BBFAD; }
-    .postit-cyan::before  { background: #1E9AB0; }
-    .postit-blue::before  { background: #2D4F8A; }
-
-    /* ── nav ── */
-    nav {
-      background: rgba(15,22,41,0.8);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(45,79,138,0.3);
-    }
-
-    /* ── section glow bg ── */
-    .section-glow {
-      position: relative;
-      overflow: hidden;
-    }
-    .section-glow::before {
-      content: '';
-      position: absolute;
-      top: -200px; left: 50%;
-      transform: translateX(-50%);
-      width: 600px; height: 400px;
-      background: radial-gradient(ellipse, rgba(30,154,176,0.06) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    /* ── feature card hover ── */
-    .feature-card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-    }
-    .feature-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(91,191,173,0.45);
-      box-shadow: 0 8px 40px rgba(30,154,176,0.15);
-    }
-
-    /* ── btn primary ── */
-    .btn-primary {
-      background: linear-gradient(135deg, #D4A017 0%, #c49214 100%);
-      color: #0F1629;
-      font-weight: 700;
-      border-radius: 10px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-    }
-    .btn-primary:hover {
-      filter: brightness(1.1);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(212,160,23,0.35);
-    }
-    .btn-primary:active { transform: translateY(0); }
-
-    .btn-secondary {
-      border: 1px solid rgba(91,191,173,0.4);
-      color: #5BBFAD;
-      border-radius: 10px;
-      background: rgba(91,191,173,0.06);
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-    }
-    .btn-secondary:hover {
-      background: rgba(91,191,173,0.12);
-      border-color: rgba(91,191,173,0.6);
-      transform: translateY(-2px);
-    }
-
-    /* ── tag/badge ── */
-    .tag {
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 3px 10px;
-      border-radius: 999px;
-    }
-
-    /* ── step connector ── */
-    .step-line {
-      width: 1px;
-      background: linear-gradient(to bottom, rgba(91,191,173,0.4), rgba(91,191,173,0));
-      margin: 0 auto;
-    }
-
-    /* ── progress bar ── */
-    .progress-bar {
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #1E9AB0, #5BBFAD);
-      transition: width 1.2s ease;
-    }
-
-    /* ── input ── */
-    .dump-input {
-      background: rgba(28,39,72,0.8);
-      border: 1px solid rgba(45,79,138,0.5);
-      color: #e2e8f0;
-      border-radius: 12px;
-      resize: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      font-family: 'Inter', sans-serif;
-    }
-    .dump-input:focus {
-      outline: none;
-      border-color: #5BBFAD;
-      box-shadow: 0 0 0 3px rgba(91,191,173,0.15);
-    }
-    .dump-input::placeholder { color: rgba(226,232,240,0.3); }
-
-    /* ── mood ring hero ── */
-    .hero-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-    }
-
-    /* ── scroll reveal ── */
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── habit dot ── */
-    .habit-dot {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .habit-dot:hover { transform: scale(1.12); }
-    .habit-dot.done {
-      background: linear-gradient(135deg, #1E9AB0, #5BBFAD);
-      color: white;
-      box-shadow: 0 2px 10px rgba(30,154,176,0.4);
-    }
-    .habit-dot.skip {
-      background: rgba(212,160,23,0.15);
-      border: 1px solid rgba(212,160,23,0.3);
-      color: #D4A017;
-    }
-    .habit-dot.miss {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.2);
-    }
-
-    /* ── label chip ── */
-    .chip {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 2px 8px; border-radius: 999px;
-      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em;
-    }
-  </style>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-<div id="stars"></div>
+  <a class="skip-link" href="#main">Saltar al contenido principal</a>
 
-<!-- ══════════════════════════════════════════
-     NAV
-══════════════════════════════════════════ -->
-<nav class="fixed top-0 left-0 right-0 z-50">
-  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-    <!-- Logo -->
-    <a href="#inicio" class="flex items-center gap-2.5">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <rect width="32" height="32" rx="8" fill="#1C2748"/>
-        <path d="M8 10 Q14 8 16 12 Q18 16 24 14" stroke="#D4A017" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-        <path d="M6 16 Q12 14 16 18 Q20 22 26 18" stroke="#5BBFAD" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-        <path d="M8 22 Q14 20 16 24 Q18 28 24 24" stroke="#1E9AB0" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      </svg>
-      <span class="font-display font-700 text-lg tracking-tight text-white">Flujo</span>
-    </a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="#inicio">flowo</a>
 
-    <!-- Nav links — desktop -->
-    <div class="hidden md:flex items-center gap-7 text-sm font-body font-400 text-slate-400">
-      <a href="#braindump" class="hover:text-teal transition-colors">Braindump</a>
-      <a href="#tareas"    class="hover:text-teal transition-colors">Tareas</a>
-      <a href="#progreso"  class="hover:text-teal transition-colors">Progreso</a>
-    </div>
-
-    <!-- CTA -->
-    <div class="flex items-center gap-3">
-      <button class="hidden md:block text-sm font-body text-slate-400 hover:text-white transition-colors px-3 py-1.5">
-        Iniciar sesión
-      </button>
-      <button class="btn-primary text-sm px-4 py-2 font-display">
-        Crear cuenta gratis
-      </button>
-    </div>
-  </div>
-</nav>
-
-
-<!-- ══════════════════════════════════════════
-     HERO / INICIO
-══════════════════════════════════════════ -->
-<section id="inicio" class="relative min-h-screen flex flex-col items-center justify-center pt-16 px-6 overflow-hidden">
-  <!-- ambient orbs -->
-  <div class="hero-orb w-96 h-96 bg-cyan opacity-20 top-10 -left-24"></div>
-  <div class="hero-orb w-80 h-80 bg-blue opacity-25 bottom-10 right-0"></div>
-  <div class="hero-orb w-48 h-48 bg-gold opacity-10 top-1/3 right-1/4"></div>
-
-  <!-- floating post-its (decorative) -->
-  <div class="postit postit-gold animate-float-slow w-52 p-4 hidden lg:block"
-       style="--r:-4deg; top:18%; left:5%; animation-delay:0s">
-    <p class="text-xs font-body text-slate-400 mb-2">🕙 hace 3 min · trabajo</p>
-    <p class="text-sm text-slate-200 leading-snug">Revisar propuesta del cliente antes del jueves</p>
-  </div>
-
-  <div class="postit postit-teal animate-float-mid w-48 p-4 hidden lg:block"
-       style="--r:3deg; top:32%; right:4%">
-    <p class="text-xs font-body text-slate-400 mb-2">🏠 casa · hace 1h</p>
-    <p class="text-sm text-slate-200 leading-snug">Comprar leche y aguacates</p>
-  </div>
-
-  <div class="postit postit-cyan animate-float-fast w-44 p-3 hidden lg:block"
-       style="--r:-2deg; bottom:24%; left:8%">
-    <p class="text-xs font-body text-slate-400 mb-2">💡 idea</p>
-    <p class="text-sm text-slate-200 leading-snug">Podcast sobre productividad minimalista</p>
-  </div>
-
-  <div class="postit postit-blue animate-float-slow w-44 p-3 hidden xl:block"
-       style="--r:5deg; bottom:20%; right:6%; animation-delay:2s">
-    <p class="text-xs font-body text-slate-400 mb-2">📚 escuela</p>
-    <p class="text-sm text-slate-200 leading-snug">Entregar proyecto de diseño el viernes</p>
-  </div>
-
-  <!-- main content -->
-  <div class="relative z-10 max-w-3xl mx-auto text-center">
-    <!-- eyebrow -->
-    <div class="inline-flex items-center gap-2 mb-6">
-      <span class="tag bg-teal/10 text-teal border border-teal/20">Beta abierta</span>
-      <span class="text-slate-500 text-xs">— Captura gratis, organiza para siempre</span>
-    </div>
-
-    <!-- headline -->
-    <h1 class="font-display font-800 text-5xl md:text-6xl lg:text-7xl leading-tight tracking-tight mb-6">
-      Tu mente<br/>
-      <span class="text-gradient">en un solo lugar.</span>
-    </h1>
-
-    <p class="font-body text-slate-400 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-10">
-      Tira tus ideas cuando llegan. Conviértelas en tareas cuando tengas tiempo.
-      <span class="text-slate-300">Sin pasos extras, sin apps perdidas.</span>
-    </p>
-
-    <!-- hero braindump input -->
-    <div class="relative max-w-xl mx-auto mb-8 group">
-      <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan/20 via-teal/10 to-blue/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
-      <div class="relative flex gap-2 p-2 rounded-2xl bg-card/80 glow-border">
-        <textarea
-          id="hero-dump"
-          rows="1"
-          placeholder="Escribe lo que sea que tienes en mente…"
-          class="dump-input flex-1 px-4 py-3 text-base"
-          oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px'"
-          onkeydown="handleDump(event)"
-        ></textarea>
-        <button
-          onclick="submitDump()"
-          class="btn-primary px-5 py-3 self-end text-sm font-display shrink-0 animate-pulse-gold flex items-center gap-2"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 1L8 11M8 1L4 5M8 1L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M2 13H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          Tirar idea
-        </button>
-      </div>
-      <p class="text-xs text-slate-500 mt-2 text-left pl-2">↵ Enter para enviar también</p>
-    </div>
-
-    <!-- confirmation toast -->
-    <div id="dump-toast"
-         class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-card glow-border px-5 py-3 rounded-xl text-sm font-body text-teal shadow-2xl">
-      <span class="text-lg">✦</span> Idea guardada en tu Braindump
-    </div>
-
-    <!-- sub-CTAs -->
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-      <a href="#braindump" class="btn-secondary px-6 py-3 text-sm font-display">
-        Ver Braindump →
-      </a>
-      <span class="text-slate-600 text-xs hidden sm:block">·</span>
-      <p class="text-xs text-slate-500">Sin tarjeta de crédito · Siempre gratuito para uso personal</p>
-    </div>
-  </div>
-
-  <!-- scroll indicator -->
-  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-40">
-    <div class="w-px h-10 bg-gradient-to-b from-teal/60 to-transparent animate-pulse"></div>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     HOW IT WORKS — 3 steps
-══════════════════════════════════════════ -->
-<section class="relative z-10 py-24 px-6 section-glow">
-  <div class="max-w-4xl mx-auto">
-    <div class="text-center mb-16 reveal">
-      <span class="tag bg-gold/10 text-gold border border-gold/20 mb-4 inline-block">Así funciona</span>
-      <h2 class="font-display font-700 text-3xl md:text-4xl text-white mt-3">
-        Del caos a la claridad<br/>en tres movimientos.
-      </h2>
-    </div>
-
-    <div class="relative grid md:grid-cols-3 gap-6">
-      <!-- step 1 -->
-      <div class="reveal feature-card glow-border bg-card rounded-2xl p-7">
-        <div class="w-11 h-11 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center mb-5">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M10 2v10M10 2L6 6M10 2L14 6" stroke="#D4A017" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M3 15h14" stroke="#D4A017" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <span class="text-xs font-600 text-gold/60 tracking-widest uppercase">01 — Tira</span>
-        <h3 class="font-display font-600 text-lg text-white mt-2 mb-3">Braindump</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Escribe lo que sea — ideas, recados, ocurrencias — sin pensar si es importante. Se guarda como post-it con fecha, etiqueta y lugar.
-        </p>
-      </div>
-
-      <!-- step 2 -->
-      <div class="reveal feature-card glow-border bg-card rounded-2xl p-7" style="transition-delay:0.1s">
-        <div class="w-11 h-11 rounded-xl bg-teal/15 border border-teal/25 flex items-center justify-center mb-5">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <rect x="3" y="3" width="14" height="14" rx="3" stroke="#5BBFAD" stroke-width="1.8"/>
-            <path d="M7 10L9 12L13 8" stroke="#5BBFAD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <span class="text-xs font-600 text-teal/60 tracking-widest uppercase">02 — Organiza</span>
-        <h3 class="font-display font-600 text-lg text-white mt-2 mb-3">Convierte a tarea</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Cuando tengas un momento libre, abre el mural, presiona un post-it y asígnale fecha, etiqueta y tiempo estimado. Se sincroniza con Google Calendar.
-        </p>
-      </div>
-
-      <!-- step 3 -->
-      <div class="reveal feature-card glow-border bg-card rounded-2xl p-7" style="transition-delay:0.2s">
-        <div class="w-11 h-11 rounded-xl bg-cyan/15 border border-cyan/25 flex items-center justify-center mb-5">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M3 14L7 10L10 13L14 7L17 10" stroke="#1E9AB0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="17" cy="10" r="1.5" fill="#1E9AB0"/>
-          </svg>
-        </div>
-        <span class="text-xs font-600 text-cyan/60 tracking-widest uppercase">03 — Avanza</span>
-        <h3 class="font-display font-600 text-lg text-white mt-2 mb-3">Progreso visual</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Tus hábitos y pendientes diarios generan un mapa visual de lo que cumples, lo que se te dificulta y cómo mejorar tu semana.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     BRAINDUMP
-══════════════════════════════════════════ -->
-<section id="braindump" class="relative z-10 py-24 px-6 overflow-hidden">
-  <!-- ambient -->
-  <div class="hero-orb w-72 h-72 bg-teal opacity-10 top-12 right-0"></div>
-
-  <div class="max-w-6xl mx-auto">
-    <div class="grid lg:grid-cols-2 gap-16 items-center">
-      <!-- text -->
-      <div class="reveal">
-        <span class="tag bg-teal/10 text-teal border border-teal/20 mb-4 inline-block">Braindump</span>
-        <h2 class="font-display font-700 text-3xl md:text-4xl text-white mt-3 mb-5 leading-tight">
-          El mural que nunca<br/>se queda sin espacio.
-        </h2>
-        <p class="text-slate-400 leading-relaxed mb-8">
-          Cada cosa que escribes se convierte en un post-it flotante con su propia huella: hora, etiqueta y contexto. El mural es infinito. Las ideas tienen su lugar aunque lleguen en el momento menos oportuno.
-        </p>
-        <ul class="space-y-4">
-          <li class="flex items-start gap-3">
-            <div class="w-6 h-6 rounded-full bg-teal/15 border border-teal/25 flex items-center justify-center shrink-0 mt-0.5">
-              <span class="text-teal text-xs">✓</span>
-            </div>
-            <span class="text-sm text-slate-300">Post-its con <strong class="text-white">hora, etiqueta y lugar</strong> automáticos</span>
-          </li>
-          <li class="flex items-start gap-3">
-            <div class="w-6 h-6 rounded-full bg-teal/15 border border-teal/25 flex items-center justify-center shrink-0 mt-0.5">
-              <span class="text-teal text-xs">✓</span>
-            </div>
-            <span class="text-sm text-slate-300">Avisos cuando hay <strong class="text-white">ideas sin organizar</strong> más de 48h</span>
-          </li>
-          <li class="flex items-start gap-3">
-            <div class="w-6 h-6 rounded-full bg-teal/15 border border-teal/25 flex items-center justify-center shrink-0 mt-0.5">
-              <span class="text-teal text-xs">✓</span>
-            </div>
-            <span class="text-sm text-slate-300">Convierte a tarea con <strong class="text-white">un solo toque</strong></span>
-          </li>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <ul>
+          <li><a href="#braindump">Braindump</a></li>
+          <li><a href="#pendientes">Pendientes</a></li>
+          <li><a href="#progreso">Progreso</a></li>
         </ul>
-      </div>
+      </nav>
 
-      <!-- braindump mockup -->
-      <div class="reveal relative h-96 lg:h-[480px]" style="transition-delay:0.15s">
-        <!-- mural background -->
-        <div class="absolute inset-0 rounded-2xl glow-border bg-deep/80"
-             style="background-image: radial-gradient(rgba(45,79,138,0.15) 1px, transparent 1px); background-size: 24px 24px;">
-        </div>
-
-        <!-- minimap hint -->
-        <div class="absolute top-3 right-3 text-xs text-slate-600 flex items-center gap-1.5">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <rect x="1" y="1" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1"/>
-            <rect x="7" y="1" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1"/>
-            <rect x="1" y="7" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1"/>
-            <rect x="7" y="7" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1"/>
-          </svg>
-          Mural · 4 ideas
-        </div>
-
-        <!-- post-its in the mockup -->
-        <div class="postit postit-gold animate-float-slow w-44 p-4"
-             style="--r:-3deg; top:8%; left:8%">
-          <div class="flex justify-between items-start mb-2">
-            <span class="chip bg-gold/10 text-gold border border-gold/15">trabajo</span>
-            <button class="text-slate-600 hover:text-teal text-xs transition-colors">⊕</button>
-          </div>
-          <p class="text-xs text-slate-300 leading-snug mb-2">Revisar propuesta antes del jueves</p>
-          <p class="text-xs text-slate-600">🕙 10:42 · hoy</p>
-        </div>
-
-        <div class="postit postit-teal animate-float-mid w-40 p-4"
-             style="--r:4deg; top:6%; right:10%">
-          <div class="flex justify-between items-start mb-2">
-            <span class="chip bg-teal/10 text-teal border border-teal/15">personal</span>
-            <button class="text-slate-600 hover:text-teal text-xs transition-colors">⊕</button>
-          </div>
-          <p class="text-xs text-slate-300 leading-snug mb-2">Llamar al dentista</p>
-          <p class="text-xs text-slate-600">🏠 casa · ayer</p>
-        </div>
-
-        <div class="postit postit-cyan animate-float-fast w-48 p-4"
-             style="--r:-1deg; top:50%; left:14%">
-          <div class="flex justify-between items-start mb-2">
-            <span class="chip bg-cyan/10 text-cyan border border-cyan/15">idea</span>
-            <button class="text-slate-600 hover:text-teal text-xs transition-colors">⊕</button>
-          </div>
-          <p class="text-xs text-slate-300 leading-snug mb-2">App para gestionar listas de compras compartidas</p>
-          <p class="text-xs text-slate-600">📍 metro · hace 2h</p>
-        </div>
-
-        <div class="postit postit-blue animate-float-slow w-44 p-4"
-             style="--r:3deg; top:54%; right:8%; animation-delay:1.5s">
-          <div class="flex justify-between items-start mb-2">
-            <span class="chip bg-blue/30 text-blue-200 border border-blue/30" style="color:#a8c0f8">escuela</span>
-            <button class="text-slate-600 hover:text-teal text-xs transition-colors">⊕</button>
-          </div>
-          <p class="text-xs text-slate-300 leading-snug mb-2">Entregar proyecto de diseño el viernes 11am</p>
-          <p class="text-xs text-slate-600">📚 biblioteca · hace 5h</p>
-        </div>
-
-        <!-- notification badge -->
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-gold/10 border border-gold/25 rounded-full px-4 py-2 text-xs text-gold font-600">
-          <span class="w-2 h-2 rounded-full bg-gold animate-pulse"></span>
-          4 ideas esperan ser organizadas
-        </div>
-      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
+        <span class="theme-toggle-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Activar modo oscuro</span>
+      </button>
     </div>
-  </div>
-</section>
+  </header>
 
+  <main id="main">
 
-<!-- ══════════════════════════════════════════
-     TAREAS / PENDIENTES
-══════════════════════════════════════════ -->
-<section id="tareas" class="relative z-10 py-24 px-6 section-glow">
-  <div class="hero-orb w-80 h-80 bg-blue opacity-15 bottom-0 left-0"></div>
-
-  <div class="max-w-6xl mx-auto">
-    <div class="grid lg:grid-cols-2 gap-16 items-center">
-
-      <!-- tareas mockup -->
-      <div class="reveal order-2 lg:order-1">
-        <div class="glow-border bg-card rounded-2xl p-6 space-y-4">
-          <!-- filter tabs -->
-          <div class="flex gap-2 flex-wrap">
-            <button class="tag bg-teal/15 text-teal border border-teal/30 cursor-pointer">Diario</button>
-            <button class="tag bg-white/4 text-slate-500 border border-white/8 cursor-pointer hover:border-teal/20 hover:text-slate-300 transition-colors">Semanal</button>
-            <button class="tag bg-white/4 text-slate-500 border border-white/8 cursor-pointer hover:border-teal/20 hover:text-slate-300 transition-colors">Mensual</button>
-            <button class="tag bg-white/4 text-slate-500 border border-white/8 cursor-pointer hover:border-teal/20 hover:text-slate-300 transition-colors">Anual</button>
-          </div>
-
-          <!-- task items -->
-          <div class="space-y-3 mt-2">
-
-            <div class="flex items-start gap-3 p-3 rounded-xl bg-deep/50 border border-white/5 hover:border-teal/15 transition-colors cursor-pointer group">
-              <div class="w-5 h-5 rounded-full border-2 border-teal shrink-0 mt-0.5 flex items-center justify-center bg-teal/20 group-hover:bg-teal/30 transition-colors">
-                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                  <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#5BBFAD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <p class="text-sm text-slate-300 line-through text-slate-500">Revisar propuesta cliente</p>
-                  <span class="chip bg-gold/10 text-gold border border-gold/15">trabajo</span>
-                </div>
-                <div class="flex items-center gap-3 mt-1 text-xs text-slate-600">
-                  <span>⏱ 45 min</span>
-                  <span>📅 Hoy · 11:00</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-3 p-3 rounded-xl bg-deep/50 border border-gold/15 cursor-pointer group">
-              <div class="w-5 h-5 rounded-full border-2 border-gold/50 shrink-0 mt-0.5"></div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <p class="text-sm text-white">Entregar proyecto de diseño</p>
-                  <span class="chip bg-blue/20 text-blue-300 border border-blue/20" style="color:#a8c0f8">escuela</span>
-                </div>
-                <div class="flex items-center gap-3 mt-1 text-xs text-slate-500">
-                  <span>⏱ 3h estimadas</span>
-                  <span>📅 Viernes · 11:00</span>
-                </div>
-                <!-- time blocks -->
-                <div class="mt-2 flex gap-1">
-                  <div class="h-1.5 flex-1 rounded bg-teal/40"></div>
-                  <div class="h-1.5 flex-1 rounded bg-teal/40"></div>
-                  <div class="h-1.5 flex-1 rounded bg-teal/40"></div>
-                  <div class="h-1.5 flex-1 rounded bg-white/8"></div>
-                  <div class="h-1.5 flex-1 rounded bg-white/8"></div>
-                  <div class="h-1.5 flex-1 rounded bg-white/8"></div>
-                </div>
-                <p class="text-xs text-slate-600 mt-1">Tiempos muertos: 3 bloques de 1h · Mar, Mié, Jue</p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-3 p-3 rounded-xl bg-deep/50 border border-white/5 hover:border-teal/15 transition-colors cursor-pointer">
-              <div class="w-5 h-5 rounded-full border-2 border-slate-600 shrink-0 mt-0.5"></div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <p class="text-sm text-slate-300">Llamar al dentista</p>
-                  <span class="chip bg-teal/10 text-teal border border-teal/15">personal</span>
-                </div>
-                <div class="flex items-center gap-3 mt-1 text-xs text-slate-600">
-                  <span>⏱ 10 min</span>
-                  <span>📅 Esta semana</span>
-                </div>
-              </div>
-            </div>
-
-            <button class="w-full mt-2 p-3 rounded-xl border border-dashed border-white/10 text-sm text-slate-600 hover:border-teal/25 hover:text-teal transition-colors flex items-center justify-center gap-2">
-              <span class="text-lg leading-none">+</span> Nueva tarea
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- text -->
-      <div class="reveal order-1 lg:order-2" style="transition-delay:0.1s">
-        <span class="tag bg-blue/15 text-blue-300 border border-blue/25 mb-4 inline-block" style="color:#a8c0f8">Pendientes</span>
-        <h2 class="font-display font-700 text-3xl md:text-4xl text-white mt-3 mb-5 leading-tight">
-          Filtra, prioriza,<br/>y termina de verdad.
-        </h2>
-        <p class="text-slate-400 leading-relaxed mb-8">
-          Cada tarea tiene su contexto: descripción, etiqueta, enlaces externos, tiempo estimado y hasta una imagen de referencia. Los tiempos muertos dividen automáticamente lo que parece imposible en bloques manejables.
+    <!-- INICIO -->
+    <section id="inicio" class="hero" aria-labelledby="inicio-title">
+      <div class="container">
+        <p class="eyebrow">tu segundo cerebro, en un solo lugar</p>
+        <h1 id="inicio-title">Tu mente no es un archivero.</h1>
+        <p class="lead">
+          Cuando una idea o un pendiente aparezca en el peor momento, tíralo aquí.
+          Después, cuando tengas tiempo, decides qué hacer con él.
         </p>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div class="glow-border bg-card/50 rounded-xl p-4">
-            <div class="text-2xl font-display font-700 text-white mb-1">6</div>
-            <div class="text-xs text-slate-500">características<br/>por tarea</div>
+        <form id="dump-form" class="dump-form" novalidate>
+          <label for="dump-input" class="visually-hidden">Escribe una idea, pendiente o recordatorio</label>
+          <textarea
+            id="dump-input"
+            name="dump"
+            rows="3"
+            placeholder="¿Qué está dando vueltas en tu cabeza ahora mismo?"
+            required
+          ></textarea>
+          <div class="dump-form-footer">
+            <span class="dump-hint">Enter para guardar · Shift+Enter para salto de línea</span>
+            <button type="submit" class="btn btn-primary">Guardar idea</button>
           </div>
-          <div class="glow-border bg-card/50 rounded-xl p-4">
-            <div class="text-2xl font-display font-700 text-teal mb-1">↔</div>
-            <div class="text-xs text-slate-500">Sync con<br/>Google Calendar</div>
-          </div>
-        </div>
+        </form>
+        <p id="dump-status" class="status-msg" role="status" aria-live="polite"></p>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-
-<!-- ══════════════════════════════════════════
-     PROGRESO VISUAL
-══════════════════════════════════════════ -->
-<section id="progreso" class="relative z-10 py-24 px-6">
-  <div class="hero-orb w-64 h-64 bg-cyan opacity-10 top-20 right-10"></div>
-
-  <div class="max-w-6xl mx-auto">
-    <div class="text-center mb-16 reveal">
-      <span class="tag bg-cyan/10 text-cyan border border-cyan/20 mb-4 inline-block">Progreso visual</span>
-      <h2 class="font-display font-700 text-3xl md:text-4xl text-white mt-3">
-        Lo que se mide, se mejora.
-      </h2>
-      <p class="text-slate-400 mt-4 max-w-xl mx-auto">
-        Tus hábitos diarios generan una base de datos personal. Flujo te muestra patrones, racha actual y qué momento del día eres más productivo.
-      </p>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-6 mb-6">
-
-      <!-- habit grid -->
-      <div class="reveal glow-border bg-card rounded-2xl p-6">
-        <div class="flex items-center justify-between mb-5">
-          <h3 class="font-display font-600 text-white text-base">Hábitos — Junio 2025</h3>
-          <span class="tag bg-teal/10 text-teal border border-teal/20">🔥 12 días racha</span>
+    <!-- BRAINDUMP -->
+    <section id="braindump" class="section" aria-labelledby="braindump-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="braindump-title">Braindump</h2>
+          <p>Aquí caen todas las ideas sin organizar. Presiona una para convertirla en un pendiente.</p>
         </div>
 
-        <!-- habit rows -->
-        <div class="space-y-4">
-          <div>
-            <div class="flex justify-between text-xs text-slate-500 mb-2">
-              <span>Ejercicio</span><span class="text-teal">10 / 13</span>
-            </div>
-            <div class="flex gap-1 flex-wrap">
-              <div class="habit-dot done">L</div><div class="habit-dot done">M</div>
-              <div class="habit-dot skip">X</div><div class="habit-dot done">J</div>
-              <div class="habit-dot done">V</div><div class="habit-dot miss">S</div>
-              <div class="habit-dot done">D</div><div class="habit-dot done">L</div>
-              <div class="habit-dot done">M</div><div class="habit-dot done">X</div>
-              <div class="habit-dot done">J</div><div class="habit-dot done">V</div>
-              <div class="habit-dot done">S</div>
-            </div>
-            <div class="progress-bar mt-2"><div class="progress-fill" style="width:77%"></div></div>
-          </div>
-
-          <div>
-            <div class="flex justify-between text-xs text-slate-500 mb-2">
-              <span>Leer 20 min</span><span class="text-teal">11 / 13</span>
-            </div>
-            <div class="flex gap-1 flex-wrap">
-              <div class="habit-dot done">L</div><div class="habit-dot done">M</div>
-              <div class="habit-dot done">X</div><div class="habit-dot done">J</div>
-              <div class="habit-dot miss">V</div><div class="habit-dot done">S</div>
-              <div class="habit-dot done">D</div><div class="habit-dot done">L</div>
-              <div class="habit-dot done">M</div><div class="habit-dot done">X</div>
-              <div class="habit-dot done">J</div><div class="habit-dot done">V</div>
-              <div class="habit-dot miss">S</div>
-            </div>
-            <div class="progress-bar mt-2"><div class="progress-fill" style="width:85%"></div></div>
-          </div>
-
-          <div>
-            <div class="flex justify-between text-xs text-slate-500 mb-2">
-              <span>Sin redes 9–12am</span><span class="text-gold">6 / 13</span>
-            </div>
-            <div class="flex gap-1 flex-wrap">
-              <div class="habit-dot done">L</div><div class="habit-dot miss">M</div>
-              <div class="habit-dot miss">X</div><div class="habit-dot done">J</div>
-              <div class="habit-dot miss">V</div><div class="habit-dot miss">S</div>
-              <div class="habit-dot done">D</div><div class="habit-dot miss">L</div>
-              <div class="habit-dot done">M</div><div class="habit-dot miss">X</div>
-              <div class="habit-dot done">J</div><div class="habit-dot miss">V</div>
-              <div class="habit-dot done">S</div>
-            </div>
-            <div class="progress-bar mt-2">
-              <div class="progress-fill" style="width:46%; background: linear-gradient(90deg,#D4A017,#c49214)"></div>
-            </div>
-          </div>
-        </div>
+        <ul id="mural-list" class="mural" aria-live="polite"></ul>
+        <p id="mural-empty" class="empty-state">Aún no hay ideas guardadas. Escribe la primera arriba, en «Inicio».</p>
       </div>
+    </section>
 
-      <!-- stats panel -->
-      <div class="reveal grid grid-rows-2 gap-6" style="transition-delay:0.1s">
-
-        <div class="glow-border bg-card rounded-2xl p-6">
-          <h3 class="font-display font-600 text-white text-sm mb-4">Semana actual</h3>
-          <div class="grid grid-cols-3 gap-4">
-            <div class="text-center">
-              <div class="text-2xl font-display font-700 text-teal">18</div>
-              <div class="text-xs text-slate-500 mt-1">tareas<br/>completadas</div>
-            </div>
-            <div class="text-center border-x border-white/5">
-              <div class="text-2xl font-display font-700 text-gold">4</div>
-              <div class="text-xs text-slate-500 mt-1">ideas en<br/>Braindump</div>
-            </div>
-            <div class="text-center">
-              <div class="text-2xl font-display font-700 text-white">2.4h</div>
-              <div class="text-xs text-slate-500 mt-1">promedio<br/>diario</div>
-            </div>
-          </div>
+    <!-- PENDIENTES -->
+    <section id="pendientes" class="section" aria-labelledby="pendientes-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="pendientes-title">Pendientes</h2>
+          <p>Filtra por frecuencia para enfocarte en lo que toca hoy, esta semana, este mes o este año.</p>
         </div>
 
-        <div class="glow-border bg-card rounded-2xl p-6">
-          <h3 class="font-display font-600 text-white text-sm mb-4">Tu mejor momento</h3>
-          <div class="flex items-end gap-1 h-20">
-            <div class="flex-1 flex flex-col justify-end gap-0.5 items-center">
-              <div class="w-full rounded-t-sm" style="height:30%; background:rgba(30,154,176,0.25)"></div>
-              <span class="text-xs text-slate-600">6a</span>
-            </div>
-            <div class="flex-1 flex flex-col justify-end gap-0.5 items-center">
-              <div class="w-full rounded-t-sm" style="height:55%; background:rgba(30,154,176,0.35)"></div>
-              <span class="text-xs text-slate-600">8a</span>
-            </div>
-            <div class="flex-1 flex flex-col justify-end gap-0.5 items-center">
-              <div class="w-full rounded-t-sm" style="height:90%; background:linear-gradient(to top,#1E9AB0,#5BBFAD)"></div>
-              <span class="text-xs text-teal font-600">10a</span>
-            </div>
-            <div class="flex-1 flex flex-col justify-end gap-0.5 items-center">
-              <div class="w-full rounded-t-sm" style="height:65%; background:rgba(30,154,176,0.35)"></div>
-              <span class="text-xs text-slate-600">12p</span>
-            </div>
-            <div class="flex-1 flex flex-col justify-end gap-0.5 items-center">
-              <div class="w-full rounded-t-sm" style="height:40%; background:rgba(30,154,176,0.25)"></div>
-              <span class="text-xs text-slate-600">2p</span>
-            </div>
-            <div class="flex-1 flex flex-col justify-end gap-0.5 items-center">
-              <div class="w-full rounded-t-sm" style="height:70%; background:rgba(30,154,176,0.3)"></div>
-              <span class="text-xs text-slate-600">4p</span>
-            </div>
-            <div class="flex-1 flex flex-col justify-end gap-0.5 items-center">
-              <div class="w-full rounded-t-sm" style="height:50%; background:rgba(30,154,176,0.25)"></div>
-              <span class="text-xs text-slate-600">6p</span>
-            </div>
-            <div class="flex-1 flex flex-col justify-end gap-0.5 items-center">
-              <div class="w-full rounded-t-sm" style="height:25%; background:rgba(30,154,176,0.15)"></div>
-              <span class="text-xs text-slate-600">8p</span>
-            </div>
-          </div>
-          <p class="text-xs text-slate-500 mt-3">Eres <strong class="text-teal">63% más efectivo</strong> entre 9am – 12pm.</p>
+        <div class="filters" role="group" aria-label="Filtrar pendientes por frecuencia">
+          <button class="filter-btn is-active" type="button" data-filter="todos" aria-pressed="true">Todos</button>
+          <button class="filter-btn" type="button" data-filter="diario" aria-pressed="false">Diario</button>
+          <button class="filter-btn" type="button" data-filter="semanal" aria-pressed="false">Semanal</button>
+          <button class="filter-btn" type="button" data-filter="mensual" aria-pressed="false">Mensual</button>
+          <button class="filter-btn" type="button" data-filter="anual" aria-pressed="false">Anual</button>
         </div>
+
+        <ul id="tasks-list" class="tasks-list" aria-live="polite"></ul>
+        <p id="tasks-empty" class="empty-state">No tienes pendientes todavía. Organiza una idea del braindump para crear el primero.</p>
       </div>
+    </section>
+
+    <!-- PROGRESO -->
+    <section id="progreso" class="section" aria-labelledby="progreso-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="progreso-title">Progreso</h2>
+          <p>Marca tus hábitos del día. Los últimos siete días se muestran como una racha.</p>
+        </div>
+
+        <ul id="habits-list" class="habits-grid" aria-live="polite"></ul>
+
+        <form id="habit-form" class="habit-form">
+          <label for="habit-input" class="visually-hidden">Nombre del nuevo hábito</label>
+          <input id="habit-input" name="habit" type="text" placeholder="Nuevo hábito, ej. Leer 20 minutos" required />
+          <button type="submit" class="btn btn-secondary">Agregar hábito</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ORGANIZE DIALOG -->
+  <div id="organize-overlay" class="dialog-overlay" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+      <h2 id="dialog-title">Convertir en pendiente</h2>
+      <form id="organize-form">
+        <div class="field">
+          <label for="task-name">Nombre</label>
+          <input id="task-name" name="task-name" type="text" required />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="task-tag">Etiqueta</label>
+            <select id="task-tag" name="task-tag">
+              <option value="personal">Personal</option>
+              <option value="trabajo">Trabajo</option>
+              <option value="escuela">Escuela</option>
+              <option value="familia">Familia</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="task-frequency">Frecuencia</label>
+            <select id="task-frequency" name="task-frequency">
+              <option value="diario">Diario</option>
+              <option value="semanal" selected>Semanal</option>
+              <option value="mensual">Mensual</option>
+              <option value="anual">Anual</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="task-date">Fecha</label>
+          <input id="task-date" name="task-date" type="date" />
+        </div>
+
+        <div class="field">
+          <label for="task-desc">Descripción (opcional)</label>
+          <textarea id="task-desc" name="task-desc" rows="2"></textarea>
+        </div>
+
+        <div class="dialog-actions">
+          <button type="button" id="dialog-cancel" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear pendiente</button>
+        </div>
+      </form>
     </div>
   </div>
-</section>
 
-
-<!-- ══════════════════════════════════════════
-     CTA FINAL
-══════════════════════════════════════════ -->
-<section class="relative z-10 py-28 px-6">
-  <div class="max-w-2xl mx-auto text-center reveal">
-    <!-- logo mark repeat -->
-    <div class="flex justify-center mb-8">
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-        <rect width="64" height="64" rx="16" fill="#1C2748"/>
-        <path d="M14 20 Q28 16 32 24 Q36 32 50 28" stroke="#D4A017" stroke-width="4" stroke-linecap="round" fill="none"/>
-        <path d="M10 32 Q24 28 32 36 Q40 44 54 36" stroke="#5BBFAD" stroke-width="4" stroke-linecap="round" fill="none"/>
-        <path d="M14 44 Q28 40 32 48 Q36 52 50 48" stroke="#1E9AB0" stroke-width="4" stroke-linecap="round" fill="none"/>
-      </svg>
+  <footer class="site-footer">
+    <div class="container">
+      <p>flowo · un proyecto personal para no perder ninguna idea.</p>
     </div>
+  </footer>
 
-    <h2 class="font-display font-800 text-4xl md:text-5xl text-white leading-tight mb-5">
-      Empieza a tirar ideas<br/>
-      <span class="text-gradient">ahora mismo.</span>
-    </h2>
-    <p class="text-slate-400 text-lg mb-10">
-      Sin configuración. Sin tutorial. Solo escribe y deja que Flujo haga el resto.
-    </p>
-
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <button class="btn-primary px-8 py-4 text-base font-display">
-        Crear cuenta gratis →
-      </button>
-      <button class="btn-secondary px-8 py-4 text-base font-display">
-        Ver demo
-      </button>
-    </div>
-
-    <p class="text-xs text-slate-600 mt-6">
-      Gratuito para uso personal · Sin tarjeta de crédito · Datos seguros
-    </p>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     FOOTER
-══════════════════════════════════════════ -->
-<footer class="relative z-10 border-t border-white/5 py-10 px-6">
-  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-600">
-    <div class="flex items-center gap-2">
-      <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-        <rect width="32" height="32" rx="8" fill="#1C2748"/>
-        <path d="M8 10 Q14 8 16 12 Q18 16 24 14" stroke="#D4A017" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-        <path d="M6 16 Q12 14 16 18 Q20 22 26 18" stroke="#5BBFAD" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-        <path d="M8 22 Q14 20 16 24 Q18 28 24 24" stroke="#1E9AB0" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      </svg>
-      <span class="font-display font-600 text-slate-400">Flujo</span>
-    </div>
-    <nav class="flex gap-6">
-      <a href="#" class="hover:text-teal transition-colors">Privacidad</a>
-      <a href="#" class="hover:text-teal transition-colors">Términos</a>
-      <a href="#" class="hover:text-teal transition-colors">Contacto</a>
-    </nav>
-    <p>© 2025 Flujo. Hecho con intención.</p>
-  </div>
-</footer>
-
-
-<!-- ══════════════════════════════════════════
-     JS
-══════════════════════════════════════════ -->
-<script>
-  /* ── star field ── */
-  (function() {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const el = document.getElementById('stars');
-
-    function resize() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-      drawStars();
-    }
-
-    function drawStars() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const count = Math.floor((canvas.width * canvas.height) / 6000);
-      for (let i = 0; i < count; i++) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const r = Math.random() * 1.2 + 0.2;
-        const alpha = Math.random() * 0.5 + 0.1;
-        const hue = Math.random() > 0.7 ? 190 : 220;
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${hue},60%,80%,${alpha})`;
-        ctx.fill();
-      }
-    }
-
-    canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
-    el.appendChild(canvas);
-    resize();
-    window.addEventListener('resize', resize);
-  })();
-
-  /* ── dump hero ── */
-  function handleDump(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      submitDump();
-    }
-  }
-
-  function submitDump() {
-    const ta = document.getElementById('hero-dump');
-    if (!ta.value.trim()) return;
-    ta.value = '';
-    ta.style.height = 'auto';
-    showToast();
-  }
-
-  function showToast() {
-    const t = document.getElementById('dump-toast');
-    t.classList.remove('hidden');
-    t.classList.add('flex');
-    clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => {
-      t.classList.add('hidden');
-      t.classList.remove('flex');
-    }, 2800);
-  }
-
-  /* ── scroll reveal ── */
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.12 });
-
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-  /* ── progress bars animate on reveal ── */
-  const barObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.querySelectorAll('.progress-fill').forEach(bar => {
-          const w = bar.style.width;
-          bar.style.width = '0%';
-          requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = w; }));
-        });
-        barObserver.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.3 });
-
-  document.querySelectorAll('.progress-bar').forEach(b => barObserver.observe(b));
-
-  /* ── habit dot toggle ── */
-  document.querySelectorAll('.habit-dot').forEach(dot => {
-    dot.addEventListener('click', () => {
-      const states = ['done','skip','miss'];
-      const cur = states.findIndex(s => dot.classList.contains(s));
-      dot.classList.remove(...states);
-      dot.classList.add(states[(cur + 1) % states.length]);
-    });
-  });
-</script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
