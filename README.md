@@ -1,4 +1,4 @@
-# Flowo
+# Breeze / Zephyr
 
 Un solo lugar para tirar ideas (braindump), convertirlas en pendientes con etiquetas y frecuencia, y dar seguimiento a hábitos diarios.
 
